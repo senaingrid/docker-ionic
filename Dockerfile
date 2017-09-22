@@ -57,6 +57,7 @@ ENV ANDROID_BUILD_TOOLS_VERSION ${ANDROID_BUILD_TOOLS_VERSION:-25.0.3}
 RUN \
   echo ANDROID_HOME=${ANDROID_HOME} >> /etc/environment && \
   dpkg --add-architecture i386 && \
+  apt-get update -qqy && \
   apt-get install -qqy --allow-unauthenticated\
           gradle  \
           libc6-i386 \
@@ -91,7 +92,7 @@ ARG NPM_VERSION
 ENV NPM_VERSION ${NPM_VERSION:-5.3.0}
 
 ARG PACKAGE_MANAGER
-ENV PACKAGE_MANAGER ${PACKAGE_MANAGER:-yarn}
+ENV PACKAGE_MANAGER ${PACKAGE_MANAGER:-npm}
 
 ENV NPM_CONFIG_LOGLEVEL info
 
@@ -135,6 +136,49 @@ RUN \
 
 
 # -----------------------------------------------------------------------------
+# Create a non-root docker user to run this container
+# -----------------------------------------------------------------------------
+ARG USER
+ENV USER ${USER:-ionic}
+
+RUN \
+  # create user with appropriate rights, groups and permissions
+  useradd --user-group --create-home --shell /bin/false ${USER} && \
+  echo "${USER}:${USER}" | chpasswd && \
+  adduser ${USER} sudo && \
+  adduser ${USER} root && \
+  chmod 770 / && \
+  usermod -a -G root ${USER} && \
+
+  # create the file and set permissions now with root user  
+  mkdir /app && chown ${USER}:${USER} /app && chmod 777 /app && \
+
+  # create the file and set permissions now with root user
+  touch /image.config && chown ${USER}:${USER} /image.config && chmod 777 /image.config && \
+
+  # this is necessary for ionic commands to run
+  mkdir /home/${USER}/.ionic && chown ${USER}:${USER} /home/${USER}/.ionic && chmod 777 /home/${USER}/.ionic && \
+
+  # this is necessary to install global npm modules
+  chmod 777 /usr/local/bin
+  #&& chown ${USER}:${USER} ${ANDROID_HOME} -R
+
+
+# -----------------------------------------------------------------------------
+# Copy start.sh and set permissions 
+# -----------------------------------------------------------------------------
+COPY start.sh /start.sh
+RUN chown ${USER}:${USER} /start.sh && chmod 777 /start.sh
+
+
+# -----------------------------------------------------------------------------
+# Switch the user of this image only now, because previous commands need to be 
+# run as root
+# -----------------------------------------------------------------------------
+USER ${USER}
+
+
+# -----------------------------------------------------------------------------
 # Install Global node modules
 # -----------------------------------------------------------------------------
 
@@ -142,7 +186,7 @@ ARG CORDOVA_VERSION
 ENV CORDOVA_VERSION ${CORDOVA_VERSION:-7.0.1}
 
 ARG IONIC_VERSION
-ENV IONIC_VERSION ${IONIC_VERSION:-3.6.1}
+ENV IONIC_VERSION ${IONIC_VERSION:-3.12.0}
 
 ARG TYPESCRIPT_VERSION
 ENV TYPESCRIPT_VERSION ${TYPESCRIPT_VERSION:-2.3.4}
@@ -150,12 +194,9 @@ ENV TYPESCRIPT_VERSION ${TYPESCRIPT_VERSION:-2.3.4}
 ARG GULP_VERSION
 ENV GULP_VERSION ${GULP_VERSION}
 
-
-# TODO: currently yarn will run into permissions issues, one way or the other if installed
-# with root or with $USER
 RUN \
   if [ "${PACKAGE_MANAGER}" != "yarn" ]; then \
-    export PACKAGE_MANAGER = "npm" && \
+    export PACKAGE_MANAGER="npm" && \
     npm install -g cordova@"${CORDOVA_VERSION}" && \
     if [ -n "${IONIC_VERSION}" ]; then npm install -g ionic@"${IONIC_VERSION}"; fi && \
     if [ -n "${TYPESCRIPT_VERSION}" ]; then npm install -g typescript@"${TYPESCRIPT_VERSION}"; fi && \
@@ -166,27 +207,7 @@ RUN \
     if [ -n "${TYPESCRIPT_VERSION}" ]; then yarn global add typescript@"${TYPESCRIPT_VERSION}"; fi && \
     if [ -n "${GULP_VERSION}" ]; then yarn global add gulp@"${GULP_VERSION}"; fi \
   fi && \
-  npm cache clean && \
-  yarn cache clean
-
-
-# -----------------------------------------------------------------------------
-# Copy start.sh and set permissions 
-# -----------------------------------------------------------------------------
-COPY start.sh /start.sh
-RUN chmod 777 /start.sh
-
-
-# -----------------------------------------------------------------------------
-# Create a non-root docker user to run this container
-# -----------------------------------------------------------------------------
-ARG USER
-ENV USER ${USER:-ionic}
-
-RUN \
-  useradd --user-group --create-home --shell /bin/false ${USER} && \
-  echo "${USER}:${USER}" | chpasswd && adduser ${USER} sudo && \
-  chown ${USER}:${USER} ${ANDROID_HOME} -R
+  ${PACKAGE_MANAGER} cache clean
 
 
 # -----------------------------------------------------------------------------
@@ -205,41 +226,22 @@ CORDOVA_VERSION: ${CORDOVA_VERSION}\n\
 IONIC_VERSION: ${IONIC_VERSION}\n\
 TYPESCRIPT_VERSION: ${TYPESCRIPT_VERSION}\n\
 GULP_VERSION: ${GULP_VERSION:-none}\n\
-" >> /image.config && chmod 777 /image.config && cat /image.config
+" >> /image.config && \
+cat /image.config
 
 
 # -----------------------------------------------------------------------------
 # Generate an Ionic default app (do this with root user, since we will not
-# have permissions for /app otherwise)
+# have permissions for /app otherwise), install the dependencies
+# and add and build android platform
 # -----------------------------------------------------------------------------
 RUN \
   cd / && \
-  if [ "${PACKAGE_MANAGER}" != "yarn" ]; then \
-    ionic start app blank --type ionic-angular --skip-deps --skip-link; \
-  else \
-    ionic start app blank --type ionic-angular --skip-deps --skip-link --yarn; \
-  fi && \
-  chown ${USER}:${USER} /app -R
-
-
-# -----------------------------------------------------------------------------
-# Switch the user of this image only now, because previous commands need to be 
-# run as root
-# -----------------------------------------------------------------------------
-USER ${USER}
-
-
-# -----------------------------------------------------------------------------
-# Install the default app's dependencies and add and build android platform
-# -----------------------------------------------------------------------------
-RUN \
+  ionic config set -g backend legacy && \
+  ionic start app blank --type ionic-angular --no-deps --no-link --no-git && \
   cd /app && \
-  if [ "${PACKAGE_MANAGER}" != "yarn" ]; then \
-    npm install \
-  else \
-    yarn install \
-  fi && \
-  ionic cordova platform add android && \
+  ${PACKAGE_MANAGER} install && \
+  ionic cordova platform add android --no-resources && \
   ionic cordova build android
 
 

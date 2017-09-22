@@ -1,7 +1,6 @@
 todo:
 - yarn version
 - android versions
-- yarn vs npm
 - cache mapping
 - watch necessary? probably not
 - test curl statement
@@ -23,9 +22,9 @@ Ionic docker image for development, build and continous integration (and certain
 - Minimal assumptions/restrictions regarding your development environment and project structure
 - Android SDK, Node, Npm, Yarn, Cordova, Ionic installed
 - Easily set package versions (Java, Android, Node, Cordova, Ionic) via cli arguments based on your project requirements
-- Usage of yarn to lock node package versions
 - Map your local Cordova/Ionic project via docker volume
 - package.json is continously watched and re-installed on changes
+- Yarn available optionally
 - Gulp available optionally
 
 
@@ -39,6 +38,7 @@ The following default versions are installed (for customizing see below):
 - Cordova: 6.5.0
 - Ionic: 3.6.1
 - Typescript: 2.3.4
+- Yarn: latest
 
 
 ## Quick start
@@ -90,7 +90,7 @@ To manage the build and run options in your project via cli parameters is a hass
 
     Download it from our repository into your project root
     ```
-    curl -o docker-compose.yml https://raw.githubusercontent.com/mswag/docker-ionic/master/docker-compose.yml
+    curl -o docker-compose.yml https://raw.githubusercontent.com/mswag/docker-ionic/develop/docker-compose.yml
     ```
     and customize it to your needs. However, the defaults should be good to start with.
 
@@ -146,8 +146,8 @@ To manage the build and run options in your project via cli parameters is a hass
     - ANDROID_PLATFORMS_VERSION (mandatory, default: 25): the Android SDK Tools platforms version that should be installed and used by Cordova
     - ANDROID_BUILD_TOOLS_VERSION (mandatory, default: 25.0.3): the Android build tools version that should be installed and used by Cordova
     - NODE_VERSION (mandatory, default: 6.9.1): the node version that should be installed globally and used by Cordova and Ionic
-    - NPM_VERSION (mandatory, default: 4.1.2): the npm version that will be installed with node globally
-    - PACKAGE_MANAGER (mandatory, default: yarn): if yarn or npm should be used as package manager
+    - NPM_VERSION (mandatory, default: 5.3.0): the npm version that will be installed with node globally
+    - PACKAGE_MANAGER (mandatory, default: npm): if yarn or npm should be used as package manager
     - CORDOVA_VERSION (mandatory, default: 6.5.0): the Cordova version that will be installed globally and used by Ionic to build the Android APKs
     - IONIC_VERSION (optional, default: 2.2.1): the Ionic version that will be installed globally to power your project
     - TYPESCRIPT_VERSION (optional, default: 2.0.3): the Typescript version that will be installed globally to translate your .ts files
