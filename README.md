@@ -1,11 +1,3 @@
-todo:
-- yarn version
-- android versions
-- cache mapping
-- watch necessary? probably not
-- test curl statement
-- finalize and fix compose file
-
 # **Ionic Docker Image**
 Ionic docker image for development, build and continous integration (and certainly useful for all Cordova projects in general as well)
 
@@ -230,6 +222,11 @@ Now you have a Docker container, that you can use to develop, build and serve yo
 * How do I deploy my APK to a device on a mac
 
     TODO: 
+
+## Roadmap & ToDos
+* Enable yarn version pinning
+* Review installed Android versions
+* Enable cache volume mapping from the client
 
 
 ## Anything missing?
