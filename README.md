@@ -42,7 +42,7 @@ cd demoapp
 
 Download the docker-compose file
 ```
-curl -o docker-compose.yml https://raw.githubusercontent.com/mswag/docker-ionic/master/docker-compose.yml
+curl -o docker-compose.yml https://raw.githubusercontent.com/senaingrid/docker-ionic/develop/docker-compose.yml
 ```
 
 Build the docker image (grab a coffee, this might take a while when you run it the first time)
@@ -82,7 +82,7 @@ To manage the build and run options in your project via cli parameters is a hass
 
     Download it from our repository into your project root
     ```
-    curl -o docker-compose.yml https://raw.githubusercontent.com/mswag/docker-ionic/develop/docker-compose.yml
+    curl -o docker-compose.yml https://raw.githubusercontent.com/senaingrid/docker-ionic/develop/docker-compose.yml
     ```
     and customize it to your needs. However, the defaults should be good to start with.
 
@@ -126,7 +126,7 @@ To manage the build and run options in your project via cli parameters is a hass
     ```
     docker build -tag [IMAGE_NAME] \
                  --build-arg [ARG=VALUE] \
-                 https://github.com/mswag/docker-ionic
+                 https://github.com/senaingrid/docker-ionic
     ```
     (this might take a while the first time)
 
@@ -149,7 +149,7 @@ To manage the build and run options in your project via cli parameters is a hass
     ```
     docker build --tag my-great-ionic2-project \
                  --build-arg USER="$USER"
-                 https://github.com/mswag/docker-ionic
+                 https://github.com/senaingrid/docker-ionic
     ```
     This will generate a Docker image named "my-great-ionic2-project" with the default configuration and a user, who's name is identical to the one on the host.
 
@@ -157,12 +157,12 @@ To manage the build and run options in your project via cli parameters is a hass
 2. Feel free to use your image and connect with a bash shell: 
 
     ```
-    docker run --name "my-great-ionic2-project" -it \
+    docker run --name "my-project" -it \
                -v $PWD:/app:rw \
                -v /dev/bus/usb:/dev/bus/usb \
                -u `id -u $USER` \
                -p 3000:3000 -p 5000:5000 -p 8100:8100 -p 8080:8080 -p 9876:9876 -p 35729:35729 \                                                     
-               my-great-ionic2-project-container
+               my-project-container
     ```
     This will run the created image with the following features:
 
@@ -197,6 +197,7 @@ Now you have a Docker container, that you can use to develop, build and serve yo
 ## Credits
 
 **This project is inspired and builds on various other projects:**
+- https://github.com/mswag/docker-ionic
 - https://github.com/agileek/docker
 - https://github.com/mkaag/docker-ionic
 - https://github.com/nodejs/docker-node
@@ -231,5 +232,3 @@ Now you have a Docker container, that you can use to develop, build and serve yo
 
 ## Anything missing?
 Great! Open a ticket or send us a PR!
-
-
