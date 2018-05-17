@@ -70,6 +70,8 @@ RUN \
              lib32z1 \
              qemu-kvm \
              kmod \
+#to fix warning: https://stackoverflow.com/questions/43433542/stuck-at-android-repositories-cfg-could-not-be-loaded
+  && touch ~/.android/repositories.cfg \
   && cd /opt \
   && mkdir android-sdk-linux \
   && cd android-sdk-linux \
