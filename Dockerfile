@@ -22,6 +22,7 @@ RUN \
           python-software-properties \
           software-properties-common \
           build-essential \
+          apt-utils \
           curl \
           expect \ 
           zip \
