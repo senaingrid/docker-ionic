@@ -156,7 +156,7 @@ RUN \
   && mkdir /home/${USER}/.ionic && chown ${USER}:${USER} /home/${USER}/.ionic && chmod 777 /home/${USER}/.ionic \
   # this is necessary to install global npm modules
   && chmod 777 /usr/local/bin
-  && chown ${USER}:${USER} ${ANDROID_HOME} -R
+  #&& chown ${USER}:${USER} ${ANDROID_HOME} -R
 
 # -----------------------------------------------------------------------------
 # Copy start.sh and set permissions 
