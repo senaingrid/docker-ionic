@@ -21,6 +21,7 @@ RUN \
           apt-transport-https \
           python-software-properties \
           software-properties-common \
+          build-essential \
           curl \
           expect \ 
           zip \
