@@ -21,9 +21,6 @@ RUN \
           apt-transport-https \
           python-software-properties \
           software-properties-common \
-          libncurses5:i386 \
-          libstdc++6:i386 \
-          zlib1g:i386 \
           build-essential \
           apt-utils \
           curl \
